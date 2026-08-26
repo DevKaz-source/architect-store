@@ -8,6 +8,7 @@ from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
+from app.bot.presentation import configure_bot_commands
 from app.bot.setup import build_dispatcher
 from app.db import dispose_engine
 from app.payments.factory import build_pix_provider
@@ -28,6 +29,7 @@ async def run() -> None:
     )
     dispatcher = build_dispatcher(settings, provider, supplier)
     await bot.delete_webhook(drop_pending_updates=False)
+    await configure_bot_commands(bot)
     supplier_task = (
         asyncio.create_task(
             run_supplier_reconciler(

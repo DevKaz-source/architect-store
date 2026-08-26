@@ -12,6 +12,7 @@ estoque: mantenha contratos, notas e autorizações de cada fornecedor.
 ## O que já está implementado
 
 - Bot em português com catálogo, saldo, recarga, compras e suporte.
+- Identidade visual da Architect Store, cartão de boas-vindas e botões com hierarquia de cor.
 - Pix via API de Orders do Mercado Pago, além de provedor `mock` para desenvolvimento.
 - QR Code, Pix Copia e Cola e link de pagamento.
 - Webhooks do Telegram e Mercado Pago autenticados.
@@ -87,13 +88,22 @@ Requisitos: Docker com Compose, um bot criado no `@BotFather` e seu Telegram ID 
    docker compose run --rm app python -m app.cli seed-mock-products
    ```
 
-6. Com `TELEGRAM_MODE=polling`, rode o bot localmente:
+6. Aplique a identidade da Architect Store ao perfil do bot:
+
+   ```bash
+   docker compose run --rm --no-deps app python -m app.cli telegram-brand
+   ```
+
+   Esse comando configura foto, nome, descrições e comandos. O `@username` continua sendo
+   alterado exclusivamente pelo `@BotFather`.
+
+7. Com `TELEGRAM_MODE=polling`, rode o bot localmente:
 
    ```bash
    docker compose run --rm app python -m app.polling
    ```
 
-7. Como alternativa, cadastre um produto de estoque manual:
+8. Como alternativa, cadastre um produto de estoque manual:
 
    ```bash
    docker compose run --rm app python -m app.cli add-product \
@@ -105,7 +115,7 @@ Requisitos: Docker com Compose, um bot criado no `@BotFather` e seu Telegram ID 
      --supplier-reference "CONTRATO-FORNECEDOR-001"
    ```
 
-8. Crie `stock-gift-card.txt`, com uma entrega por linha, e importe:
+9. Crie `stock-gift-card.txt`, com uma entrega por linha, e importe:
 
    ```bash
    docker compose run --rm \
@@ -120,7 +130,7 @@ Requisitos: Docker com Compose, um bot criado no `@BotFather` e seu Telegram ID 
    Arquivos `stock-*.txt` são ignorados pelo Git e devem ser apagados com segurança após
    a importação.
 
-9. No bot, gere um Pix mock e aprove o identificador exibido:
+10. No bot, gere um Pix mock e aprove o identificador exibido:
 
    ```bash
    docker compose run --rm app python -m app.cli approve-mock UUID-DO-DEPOSITO

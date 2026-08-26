@@ -8,13 +8,14 @@ from contextlib import asynccontextmanager, suppress
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.types import BotCommand, Update
+from aiogram.types import Update
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 from sqlalchemy import text
 
 from app import __version__
+from app.bot.presentation import configure_bot_commands
 from app.bot.setup import build_dispatcher
 from app.db import SessionFactory, dispose_engine
 from app.money import format_brl
@@ -106,17 +107,7 @@ async def lifespan(app: FastAPI):
     app.state.redis = redis
     await dispatcher.emit_startup(bot=bot)
 
-    await bot.set_my_commands(
-        [
-            BotCommand(command="start", description="Abrir a loja"),
-            BotCommand(command="catalogo", description="Ver produtos"),
-            BotCommand(command="saldo", description="Consultar e adicionar saldo"),
-            BotCommand(command="compras", description="Ver minhas compras"),
-            BotCommand(command="suporte", description="Abrir chamado"),
-            BotCommand(command="responder_suporte", description="Responder ao suporte"),
-            BotCommand(command="cancelar", description="Cancelar operação atual"),
-        ]
-    )
+    await configure_bot_commands(bot)
     if settings.telegram_mode == "webhook":
         await bot.set_webhook(
             settings.telegram_webhook_url,

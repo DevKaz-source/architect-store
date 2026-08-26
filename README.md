@@ -9,7 +9,7 @@
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?logo=fastapi&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-25%20passed-2EA44F)
+![Tests](https://img.shields.io/badge/tests-30%20passed-2EA44F)
 ![Status](https://img.shields.io/badge/status-sandbox-F59E0B)
 [![CI](https://github.com/DevKaz-source/architect-store/actions/workflows/ci.yml/badge.svg)](https://github.com/DevKaz-source/architect-store/actions/workflows/ci.yml)
 
@@ -51,7 +51,7 @@ same workflow:
 Latest local quality gate:
 
 ```text
-25 passed, 5 subtests passed
+30 passed, 5 subtests passed
 All checks passed!
 ```
 
@@ -120,8 +120,13 @@ docker compose up -d db redis
 docker compose run --rm app alembic upgrade head
 docker compose run --rm app python -m app.cli mock-catalog
 docker compose run --rm app python -m app.cli seed-mock-products
+docker compose run --rm --no-deps app python -m app.cli telegram-brand
 docker compose run --rm app python -m app.polling
 ```
+
+`telegram-brand` applies the Architect Store name, descriptions, command menu and bundled
+avatar to the bot profile. The bot username remains managed by `@BotFather`. The customer
+interface includes a branded welcome card, styled buttons and explicit sandbox disclosure.
 
 See the complete Windows and failure-simulation guide in
 [`docs/MOCK_SUPPLIER.md`](docs/MOCK_SUPPLIER.md).
@@ -143,6 +148,7 @@ Ruff. No production credentials are required.
 | Path | Responsibility |
 |---|---|
 | `app/bot/` | Telegram commands, callbacks and customer/admin flows |
+| `app/assets/` | Bot avatar and branded welcome media |
 | `app/services/` | Transaction boundaries and business rules |
 | `app/payments/` | Pix provider interface and implementations |
 | `app/suppliers/` | Supplier interface, mock scenarios and Reloadly adapter |

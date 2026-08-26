@@ -9,6 +9,13 @@ from aiogram.filters import Command
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from app.bot.keyboards import catalog_keyboard
+from app.bot.presentation import (
+    BALANCE_BUTTON,
+    CATALOG_BUTTON,
+    LEGACY_CATALOG_BUTTON,
+    LEGACY_ORDERS_BUTTON,
+    ORDERS_BUTTON,
+)
 from app.models import OrderStatus
 from app.money import format_brl
 from app.services.catalog import (
@@ -37,20 +44,37 @@ ORDER_ICONS = {
 }
 
 
-async def show_catalog(message: Message) -> None:
+async def show_catalog(message: Message, *, edit: bool = False) -> None:
     items = await list_catalog()
     if not items:
-        await message.answer("O catálogo está sendo atualizado. Volte em alguns minutos.")
+        text = "🔄 <b>Catálogo em atualização</b>\nVolte em alguns minutos."
+        if edit:
+            await message.edit_text(text)
+        else:
+            await message.answer(text)
         return
-    await message.answer(
-        "<b>Catálogo</b>\nEscolha um produto:", reply_markup=catalog_keyboard(items)
+    text = (
+        "🛍️ <b>Catálogo Architect Store</b>\n\n"
+        "Escolha um produto para ver detalhes, preço e disponibilidade."
     )
+    keyboard = catalog_keyboard(items)
+    if edit:
+        await message.edit_text(text, reply_markup=keyboard)
+    else:
+        await message.answer(text, reply_markup=keyboard)
 
 
 @router.message(Command("catalogo"))
-@router.message(F.text == "🛍 Catálogo")
+@router.message(F.text.in_({CATALOG_BUTTON, LEGACY_CATALOG_BUTTON}))
 async def catalog(message: Message) -> None:
     await show_catalog(message)
+
+
+@router.callback_query(F.data == "catalog:back")
+async def catalog_back(callback: CallbackQuery) -> None:
+    if callback.message:
+        await show_catalog(callback.message, edit=True)
+    await callback.answer()
 
 
 @router.callback_query(F.data.startswith("product:"))
@@ -69,20 +93,31 @@ async def product_details(callback: CallbackQuery) -> None:
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text=f"Comprar por {format_brl(item.price_cents)}",
+                    text=f"✓ Comprar agora · {format_brl(item.price_cents)}",
                     callback_data=f"buy:{item.id}:{nonce}",
+                    style="success",
                 )
-            ]
+            ],
+            [
+                InlineKeyboardButton(
+                    text="‹ Voltar ao catálogo",
+                    callback_data="catalog:back",
+                    style="primary",
+                )
+            ],
         ]
     )
     if callback.message:
-        await callback.message.answer(
-            f"<b>{escape(item.name)}</b>\n\n"
+        await callback.message.edit_text(
+            f"🎁 <b>{escape(item.name)}</b>\n\n"
             f"{escape(item.description, quote=False)}\n\n"
-            f"Preço: <b>{format_brl(item.price_cents)}</b>\n"
-            f"Disponibilidade: <b>{item.availability_label}</b>\n\n"
-            "Ao confirmar, o valor é debitado. Produtos de fornecedor normalmente "
-            "são entregues em segundos; pedidos pendentes entram em conciliação.",
+            "━━━━━━━━━━━━━━━━━━\n"
+            f"💳 <b>Preço:</b> {format_brl(item.price_cents)}\n"
+            f"⚡ <b>Entrega:</b> automática\n"
+            f"🟢 <b>Disponibilidade:</b> {item.availability_label}\n"
+            "🔐 <b>Proteção:</b> entrega exibida somente ao comprador\n\n"
+            "Ao confirmar, o valor será debitado uma única vez. Pedidos pendentes "
+            "entram em conciliação automática.",
             reply_markup=keyboard,
         )
     await callback.answer()
@@ -113,7 +148,7 @@ async def buy(callback: CallbackQuery, giftcard_supplier: GiftCardSupplier | Non
             missing = exc.price_cents - exc.balance_cents
             await callback.message.answer(
                 f"Saldo insuficiente. Faltam <b>{format_brl(missing)}</b>. "
-                "Use <b>💰 Meu saldo</b> para adicionar crédito via Pix."
+                f"Use <b>{BALANCE_BUTTON}</b> para adicionar crédito via Pix."
             )
         return
     except OutOfStock:
@@ -149,7 +184,7 @@ async def buy(callback: CallbackQuery, giftcard_supplier: GiftCardSupplier | Non
                 f"Produto: {escape(result.product_name)}\n"
                 f"Saldo restante: <b>{format_brl(result.balance_cents)}</b>\n\n"
                 "A compra não será repetida. Estamos conciliando com o fornecedor; "
-                "acompanhe em <b>📦 Minhas compras</b> ou abra um chamado se demorar."
+                f"acompanhe em <b>{ORDERS_BUTTON}</b> ou abra um chamado se demorar."
             )
             return
         await callback.message.answer(
@@ -172,7 +207,7 @@ async def buy(callback: CallbackQuery, giftcard_supplier: GiftCardSupplier | Non
 
 
 @router.message(Command("compras"))
-@router.message(F.text == "📦 Minhas compras")
+@router.message(F.text.in_({ORDERS_BUTTON, LEGACY_ORDERS_BUTTON}))
 async def purchases(message: Message) -> None:
     if message.from_user is None:
         return
@@ -193,7 +228,8 @@ async def purchases(message: Message) -> None:
         for order in orders
     ]
     await message.answer(
-        "<b>Suas compras recentes</b>\nToque para visualizar a entrega:",
+        "📦 <b>Seus pedidos recentes</b>\n\n"
+        "Toque em um pedido para consultar o status e visualizar a entrega:",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=rows),
     )
 

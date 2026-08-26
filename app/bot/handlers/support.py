@@ -8,6 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message
 
+from app.bot.presentation import LEGACY_SUPPORT_BUTTON, SUPPORT_BUTTON
 from app.services.support import TicketResult, add_user_reply, create_ticket
 from app.settings import Settings
 
@@ -45,10 +46,11 @@ async def _notify_staff(
 
 
 @router.message(Command("suporte"))
-@router.message(F.text == "🆘 Suporte")
+@router.message(F.text.in_({SUPPORT_BUTTON, LEGACY_SUPPORT_BUTTON}))
 async def support_start(message: Message, state: FSMContext) -> None:
     await state.set_state(SupportStates.waiting_message)
     await message.answer(
+        "💬 <b>Central de suporte</b>\n\n"
         "Descreva o problema em uma única mensagem. Inclua o código do pedido, se houver.\n\n"
         "Não envie senhas pessoais, documentos ou dados bancários. Use /cancelar para sair."
     )

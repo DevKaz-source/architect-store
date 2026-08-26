@@ -9,8 +9,10 @@ from datetime import UTC, datetime
 from decimal import ROUND_UP, Decimal, InvalidOperation
 from pathlib import Path
 
+from aiogram import Bot
 from sqlalchemy import func, select
 
+from app.bot.presentation import apply_telegram_brand
 from app.db import SessionFactory, create_schema_for_development, dispose_engine
 from app.models import (
     DeliveryType,
@@ -192,6 +194,22 @@ async def import_stock(args: argparse.Namespace) -> None:
 async def approve_mock(args: argparse.Namespace) -> None:
     result = await approve_mock_deposit(uuid.UUID(args.deposit_id))
     print(f"Depósito {result.deposit_id} aprovado; saldo={format_brl(result.balance_cents or 0)}")
+
+
+async def telegram_brand(_args: argparse.Namespace) -> None:
+    settings = get_settings()
+    if settings.telegram_bot_token == "development-token":
+        raise ValueError("TELEGRAM_BOT_TOKEN não foi configurado")
+    bot = Bot(token=settings.telegram_bot_token)
+    try:
+        await apply_telegram_brand(bot, settings)
+        identity = await bot.get_me()
+        print(
+            f"Perfil atualizado: Architect Store · @{identity.username} · "
+            "foto, nome, descrição e comandos aplicados."
+        )
+    finally:
+        await bot.session.close()
 
 
 async def list_review_deposits(_args: argparse.Namespace) -> None:
@@ -752,6 +770,11 @@ def build_parser() -> argparse.ArgumentParser:
     command = subparsers.add_parser("approve-mock", help="aprovar depósito no modo de teste")
     command.add_argument("deposit_id")
     command.set_defaults(handler=approve_mock)
+
+    command = subparsers.add_parser(
+        "telegram-brand", help="aplicar nome, descrições, comandos e avatar no Telegram"
+    )
+    command.set_defaults(handler=telegram_brand)
 
     command = subparsers.add_parser(
         "list-review-deposits", help="listar depósitos que exigem revisão"

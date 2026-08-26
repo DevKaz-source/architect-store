@@ -18,6 +18,7 @@ from aiogram.types import (
     Message,
 )
 
+from app.bot.presentation import BALANCE_BUTTON, LEGACY_BALANCE_BUTTON
 from app.money import InvalidMoney, format_brl, parse_brl_to_cents
 from app.payments.base import PixProvider, PixProviderError
 from app.services.payments import (
@@ -43,7 +44,10 @@ async def _show_balance(message: Message) -> None:
     if message.from_user is None:
         return
     summary = await get_wallet_summary(message.from_user.id)
-    lines = [f"<b>Saldo: {format_brl(summary.balance_cents)}</b>"]
+    lines = [
+        "💳 <b>Minha carteira</b>",
+        f"\nSaldo disponível: <b>{format_brl(summary.balance_cents)}</b>",
+    ]
     if summary.entries:
         lines.append("\nÚltimos lançamentos:")
         for entry in summary.entries:
@@ -52,14 +56,20 @@ async def _show_balance(message: Message) -> None:
             lines.append(f"• {sign}{format_brl(entry.amount_cents)} · {note}")
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="➕ Adicionar saldo via Pix", callback_data="topup:start")]
+            [
+                InlineKeyboardButton(
+                    text="＋ Adicionar saldo via Pix",
+                    callback_data="topup:start",
+                    style="primary",
+                )
+            ]
         ]
     )
     await message.answer("\n".join(lines), reply_markup=keyboard)
 
 
 @router.message(Command("saldo"))
-@router.message(F.text == "💰 Meu saldo")
+@router.message(F.text.in_({BALANCE_BUTTON, LEGACY_BALANCE_BUTTON}))
 async def balance(message: Message) -> None:
     await _show_balance(message)
 
@@ -132,7 +142,9 @@ async def receive_amount(
     user = await get_user_by_telegram(message.from_user.id)
     if user is None or not user.email:
         await state.clear()
-        await message.answer("Não encontrei seu e-mail. Inicie novamente em 💰 Meu saldo.")
+        await message.answer(
+            f"Não encontrei seu e-mail. Inicie novamente em {BALANCE_BUTTON}."
+        )
         return
 
     await message.answer("Gerando seu Pix…")
@@ -165,7 +177,9 @@ async def receive_amount(
     keyboard_rows.append(
         [
             InlineKeyboardButton(
-                text="Já paguei · verificar", callback_data=f"pixcheck:{deposit.id.hex}"
+                text="✓ Já paguei · verificar",
+                callback_data=f"pixcheck:{deposit.id.hex}",
+                style="success",
             )
         ]
     )
