@@ -1,0 +1,1 @@
+"""Regras transacionais da loja."""

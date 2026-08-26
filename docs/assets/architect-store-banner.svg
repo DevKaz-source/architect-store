@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" role="img" aria-labelledby="title description">
+  <title id="title">Architect Store</title>
+  <description id="description">Transaction-safe Telegram commerce engine</description>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#080b18"/>
+      <stop offset="0.52" stop-color="#111536"/>
+      <stop offset="1" stop-color="#080b18"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c3aed"/>
+      <stop offset="0.52" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+    <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="400" rx="24" fill="url(#background)"/>
+  <rect width="1200" height="400" rx="24" fill="url(#grid)"/>
+  <ellipse cx="930" cy="190" rx="360" ry="290" fill="url(#glow)"/>
+
+  <g transform="translate(82 72)">
+    <path d="M0 236 L100 0 L200 236" fill="none" stroke="url(#accent)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" filter="url(#soft-glow)"/>
+    <path d="M47 146 H153" fill="none" stroke="#f8fafc" stroke-width="14" stroke-linecap="round"/>
+    <circle cx="100" cy="0" r="8" fill="#22d3ee"/>
+    <circle cx="0" cy="236" r="8" fill="#8b5cf6"/>
+    <circle cx="200" cy="236" r="8" fill="#a78bfa"/>
+  </g>
+
+  <g transform="translate(355 112)" font-family="Inter, Segoe UI, Arial, sans-serif">
+    <text x="0" y="66" fill="#f8fafc" font-size="64" font-weight="800" letter-spacing="4">ARCHITECT STORE</text>
+    <text x="3" y="118" fill="#a5b4fc" font-size="23" font-weight="500" letter-spacing="2">TRANSACTION-SAFE TELEGRAM COMMERCE</text>
+    <g transform="translate(3 164)" font-size="17" font-weight="600">
+      <rect x="0" y="0" width="132" height="40" rx="20" fill="#7c3aed" fill-opacity="0.18" stroke="#8b5cf6" stroke-opacity="0.7"/>
+      <text x="66" y="26" text-anchor="middle" fill="#ddd6fe">IDEMPOTENT</text>
+      <rect x="148" y="0" width="126" height="40" rx="20" fill="#0891b2" fill-opacity="0.18" stroke="#22d3ee" stroke-opacity="0.7"/>
+      <text x="211" y="26" text-anchor="middle" fill="#cffafe">ENCRYPTED</text>
+      <rect x="290" y="0" width="122" height="40" rx="20" fill="#7c3aed" fill-opacity="0.18" stroke="#a78bfa" stroke-opacity="0.7"/>
+      <text x="351" y="26" text-anchor="middle" fill="#ede9fe">TESTED</text>
+    </g>
+  </g>
+
+  <g fill="none" stroke="url(#accent)" stroke-width="2" opacity="0.58">
+    <path d="M874 292 L944 247 L1028 281 L1102 222"/>
+    <path d="M944 247 L982 173 L1080 150"/>
+  </g>
+  <g fill="#0f172a" stroke="#67e8f9" stroke-width="3">
+    <circle cx="874" cy="292" r="8"/>
+    <circle cx="944" cy="247" r="8"/>
+    <circle cx="1028" cy="281" r="8"/>
+    <circle cx="1102" cy="222" r="8"/>
+    <circle cx="982" cy="173" r="8"/>
+    <circle cx="1080" cy="150" r="8"/>
+  </g>
+
+  <rect x="1" y="1" width="1198" height="398" rx="23" fill="none" stroke="#a78bfa" stroke-opacity="0.22" stroke-width="2"/>
+</svg>
