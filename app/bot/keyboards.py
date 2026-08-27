@@ -36,6 +36,50 @@ def main_menu() -> ReplyKeyboardMarkup:
     )
 
 
+def home_keyboard() -> InlineKeyboardMarkup:
+    """Primary navigation attached to the branded storefront card."""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=CATALOG_BUTTON,
+                    callback_data="home:catalog",
+                    style="primary",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="＋ Adicionar saldo via Pix",
+                    callback_data="home:topup",
+                    style="success",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=BALANCE_BUTTON,
+                    callback_data="home:wallet",
+                    style="primary",
+                ),
+                InlineKeyboardButton(
+                    text=ORDERS_BUTTON,
+                    callback_data="home:orders",
+                    style="primary",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text=SUPPORT_BUTTON,
+                    callback_data="home:support",
+                ),
+                InlineKeyboardButton(
+                    text="↻ Atualizar painel",
+                    callback_data="home:refresh",
+                ),
+            ],
+        ]
+    )
+
+
 def terms_keyboard(settings: Settings) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[

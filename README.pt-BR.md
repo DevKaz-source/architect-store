@@ -12,7 +12,8 @@ estoque: mantenha contratos, notas e autorizações de cada fornecedor.
 ## O que já está implementado
 
 - Bot em português com catálogo, saldo, recarga, compras e suporte.
-- Identidade visual da Architect Store, cartão de boas-vindas e botões com hierarquia de cor.
+- Identidade visual da Architect Store, painel inicial com saldo acima do banner e menu
+  inline anexado à vitrine.
 - Pix via API de Orders do Mercado Pago, além de provedor `mock` para desenvolvimento.
 - QR Code, Pix Copia e Cola e link de pagamento.
 - Webhooks do Telegram e Mercado Pago autenticados.

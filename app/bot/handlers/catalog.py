@@ -70,6 +70,13 @@ async def catalog(message: Message) -> None:
     await show_catalog(message)
 
 
+@router.callback_query(F.data == "home:catalog")
+async def catalog_from_home(callback: CallbackQuery) -> None:
+    if callback.message:
+        await show_catalog(callback.message)
+    await callback.answer()
+
+
 @router.callback_query(F.data == "catalog:back")
 async def catalog_back(callback: CallbackQuery) -> None:
     if callback.message:
@@ -211,7 +218,11 @@ async def buy(callback: CallbackQuery, giftcard_supplier: GiftCardSupplier | Non
 async def purchases(message: Message) -> None:
     if message.from_user is None:
         return
-    orders = await list_user_orders(message.from_user.id)
+    await show_purchases(message, telegram_id=message.from_user.id)
+
+
+async def show_purchases(message: Message, *, telegram_id: int) -> None:
+    orders = await list_user_orders(telegram_id)
     if not orders:
         await message.answer("Você ainda não fez nenhuma compra.")
         return
@@ -232,6 +243,13 @@ async def purchases(message: Message) -> None:
         "Toque em um pedido para consultar o status e visualizar a entrega:",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=rows),
     )
+
+
+@router.callback_query(F.data == "home:orders")
+async def purchases_from_home(callback: CallbackQuery) -> None:
+    if callback.message:
+        await show_purchases(callback.message, telegram_id=callback.from_user.id)
+    await callback.answer()
 
 
 @router.callback_query(F.data.startswith("order:"))

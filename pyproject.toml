@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "telegram-digital-store"
-version = "0.5.0"
+version = "0.6.0"
 description = "Architect Store: produtos digitais no Telegram com Pix e fornecedores"
 readme = "README.md"
 requires-python = ">=3.12"

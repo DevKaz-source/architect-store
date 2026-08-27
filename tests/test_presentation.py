@@ -4,7 +4,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from app.bot.keyboards import catalog_keyboard, main_menu
+from app.bot.handlers.start import home_caption
+from app.bot.keyboards import catalog_keyboard, home_keyboard, main_menu
 from app.bot.presentation import (
     AVATAR_PATH,
     BALANCE_BUTTON,
@@ -39,6 +40,35 @@ def test_main_menu_uses_brand_labels_and_button_styles() -> None:
         ["primary", None],
     ]
     assert menu.is_persistent is True
+
+
+def test_home_keyboard_builds_inline_storefront_dashboard() -> None:
+    menu = home_keyboard()
+    assert [[button.text for button in row] for row in menu.inline_keyboard] == [
+        [CATALOG_BUTTON],
+        ["＋ Adicionar saldo via Pix"],
+        [BALANCE_BUTTON, ORDERS_BUTTON],
+        [SUPPORT_BUTTON, "↻ Atualizar painel"],
+    ]
+    assert [[button.callback_data for button in row] for row in menu.inline_keyboard] == [
+        ["home:catalog"],
+        ["home:topup"],
+        ["home:wallet", "home:orders"],
+        ["home:support", "home:refresh"],
+    ]
+
+
+def test_home_caption_shows_customer_summary_and_demo_notice() -> None:
+    caption = home_caption(
+        first_name="Kaz",
+        telegram_id=123456,
+        balance_cents=5_000,
+        settings=Settings(app_env="development", pix_provider="mock"),
+    )
+    assert "Kaz" in caption
+    assert "123456" in caption
+    assert "R$ 50,00" in caption
+    assert "Ambiente de demonstração" in caption
 
 
 def test_catalog_keyboard_shows_product_and_price() -> None:

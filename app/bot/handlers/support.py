@@ -6,7 +6,7 @@ from aiogram import Bot, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import Message
+from aiogram.types import CallbackQuery, Message
 
 from app.bot.presentation import LEGACY_SUPPORT_BUTTON, SUPPORT_BUTTON
 from app.services.support import TicketResult, add_user_reply, create_ticket
@@ -54,6 +54,20 @@ async def support_start(message: Message, state: FSMContext) -> None:
         "Descreva o problema em uma única mensagem. Inclua o código do pedido, se houver.\n\n"
         "Não envie senhas pessoais, documentos ou dados bancários. Use /cancelar para sair."
     )
+
+
+@router.callback_query(F.data == "home:support")
+async def support_from_home(callback: CallbackQuery, state: FSMContext) -> None:
+    await state.set_state(SupportStates.waiting_message)
+    if callback.message:
+        await callback.message.answer(
+            "💬 <b>Central de suporte</b>\n\n"
+            "Descreva o problema em uma única mensagem. Inclua o código do pedido, "
+            "se houver.\n\n"
+            "Não envie senhas pessoais, documentos ou dados bancários. "
+            "Use /cancelar para sair."
+        )
+    await callback.answer()
 
 
 @router.message(Command("responder_suporte"))

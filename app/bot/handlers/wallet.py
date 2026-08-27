@@ -40,10 +40,11 @@ class TopUpStates(StatesGroup):
     waiting_amount = State()
 
 
-async def _show_balance(message: Message) -> None:
-    if message.from_user is None:
+async def _show_balance(message: Message, *, telegram_id: int | None = None) -> None:
+    if telegram_id is None and message.from_user is None:
         return
-    summary = await get_wallet_summary(message.from_user.id)
+    resolved_telegram_id = telegram_id or message.from_user.id
+    summary = await get_wallet_summary(resolved_telegram_id)
     lines = [
         "💳 <b>Minha carteira</b>",
         f"\nSaldo disponível: <b>{format_brl(summary.balance_cents)}</b>",
@@ -74,7 +75,14 @@ async def balance(message: Message) -> None:
     await _show_balance(message)
 
 
-@router.callback_query(F.data == "topup:start")
+@router.callback_query(F.data == "home:wallet")
+async def balance_from_home(callback: CallbackQuery) -> None:
+    if callback.message:
+        await _show_balance(callback.message, telegram_id=callback.from_user.id)
+    await callback.answer()
+
+
+@router.callback_query(F.data.in_({"topup:start", "home:topup"}))
 async def topup_start(callback: CallbackQuery, state: FSMContext, settings: Settings) -> None:
     user = await get_user_by_telegram(callback.from_user.id)
     if user is None or user.accepted_terms_at is None:

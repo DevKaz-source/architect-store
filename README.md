@@ -9,7 +9,7 @@
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?logo=fastapi&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-30%20passed-2EA44F)
+![Tests](https://img.shields.io/badge/tests-32%20passed-2EA44F)
 ![Status](https://img.shields.io/badge/status-sandbox-F59E0B)
 [![CI](https://github.com/DevKaz-source/architect-store/actions/workflows/ci.yml/badge.svg)](https://github.com/DevKaz-source/architect-store/actions/workflows/ci.yml)
 
@@ -51,7 +51,7 @@ same workflow:
 Latest local quality gate:
 
 ```text
-30 passed, 5 subtests passed
+32 passed, 5 subtests passed
 All checks passed!
 ```
 
@@ -126,7 +126,8 @@ docker compose run --rm app python -m app.polling
 
 `telegram-brand` applies the Architect Store name, descriptions, command menu and bundled
 avatar to the bot profile. The bot username remains managed by `@BotFather`. The customer
-interface includes a branded welcome card, styled buttons and explicit sandbox disclosure.
+interface includes a branded storefront dashboard with the customer's balance above the
+welcome media, attached inline navigation and explicit sandbox disclosure.
 
 See the complete Windows and failure-simulation guide in
 [`docs/MOCK_SUPPLIER.md`](docs/MOCK_SUPPLIER.md).

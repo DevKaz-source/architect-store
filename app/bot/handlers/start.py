@@ -1,17 +1,58 @@
 from __future__ import annotations
 
+from contextlib import suppress
 from html import escape
 
 from aiogram import F, Router
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart
-from aiogram.types import CallbackQuery, FSInputFile, Message
+from aiogram.types import CallbackQuery, FSInputFile, Message, ReplyKeyboardRemove
 
-from app.bot.keyboards import main_menu, terms_keyboard
+from app.bot.keyboards import home_keyboard, terms_keyboard
 from app.bot.presentation import WELCOME_IMAGE_PATH, environment_notice
+from app.money import format_brl
 from app.services.users import accept_terms, get_or_create_user
+from app.services.wallets import get_wallet_summary
 from app.settings import Settings
 
 router = Router(name="start")
+
+
+def home_caption(
+    *, first_name: str, telegram_id: int, balance_cents: int, settings: Settings
+) -> str:
+    return (
+        f"👋 Olá, <b>{escape(first_name)}</b>\n\n"
+        "ℹ️ <b>Seus dados</b>\n"
+        f"🆔 ID: <code>{telegram_id}</code>\n"
+        f"💳 Saldo disponível: <b>{format_brl(balance_cents)}</b>\n"
+        "⚡ Entrega digital automatizada\n\n"
+        "<b>O que você deseja fazer?</b>"
+        f"{environment_notice(settings)}"
+    )
+
+
+async def send_home(
+    message: Message, *, telegram_id: int, first_name: str, settings: Settings
+) -> None:
+    summary = await get_wallet_summary(telegram_id)
+    reset_message = await message.answer(
+        "Abrindo a Architect Store…",
+        reply_markup=ReplyKeyboardRemove(),
+    )
+    await message.answer_photo(
+        FSInputFile(WELCOME_IMAGE_PATH),
+        caption=home_caption(
+            first_name=first_name,
+            telegram_id=telegram_id,
+            balance_cents=summary.balance_cents,
+            settings=settings,
+        ),
+        reply_markup=home_keyboard(),
+        show_caption_above_media=True,
+    )
+    with suppress(TelegramBadRequest):
+        await reset_message.delete()
 
 
 @router.message(CommandStart())
@@ -38,15 +79,11 @@ async def start(message: Message, settings: Settings) -> None:
         )
         return
 
-    await message.answer_photo(
-        FSInputFile(WELCOME_IMAGE_PATH),
-        caption=(
-            f"Olá, <b>{escape(user.first_name)}</b>. 👋\n\n"
-            "<b>Sua loja digital está pronta.</b>\n"
-            "Explore o catálogo, consulte sua carteira ou acompanhe seus pedidos."
-            f"{environment_notice(settings)}"
-        ),
-        reply_markup=main_menu(),
+    await send_home(
+        message,
+        telegram_id=user.telegram_id,
+        first_name=user.first_name,
+        settings=settings,
     )
 
 
@@ -58,9 +95,31 @@ async def terms_accept(callback: CallbackQuery, settings: Settings) -> None:
     await callback.answer("Termos aceitos")
     if callback.message:
         await callback.message.edit_reply_markup(reply_markup=None)
-        await callback.message.answer(
-            "✅ <b>Conta criada com sucesso</b>\n\n"
-            "Agora escolha por onde deseja começar."
-            f"{environment_notice(settings)}",
-            reply_markup=main_menu(),
+        await send_home(
+            callback.message,
+            telegram_id=callback.from_user.id,
+            first_name=callback.from_user.first_name,
+            settings=settings,
         )
+
+
+@router.callback_query(F.data == "home:refresh")
+async def home_refresh(callback: CallbackQuery, settings: Settings) -> None:
+    summary = await get_wallet_summary(callback.from_user.id)
+    if callback.message:
+        try:
+            await callback.message.edit_caption(
+                caption=home_caption(
+                    first_name=callback.from_user.first_name,
+                    telegram_id=callback.from_user.id,
+                    balance_cents=summary.balance_cents,
+                    settings=settings,
+                ),
+                reply_markup=home_keyboard(),
+            )
+        except TelegramBadRequest as exc:
+            if "message is not modified" not in str(exc).lower():
+                raise
+            await callback.answer("O painel já está atualizado")
+            return
+    await callback.answer("Painel atualizado")
