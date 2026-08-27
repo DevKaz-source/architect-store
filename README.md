@@ -20,6 +20,13 @@
 > **Portfolio / sandbox project.** The current public build does not sell real products.
 > Mock payments and mock supplier codes have no monetary value.
 
+## Product demo
+
+[![Watch the Architect Store Telegram demo](docs/assets/social-preview.png)](docs/assets/architect-store-demo.mp4)
+
+▶️ **[Watch the 15-second storefront demo](docs/assets/architect-store-demo.mp4)** — catalog,
+sandbox purchase, transactional balance update and order history inside Telegram.
+
 ## Why this project stands out
 
 Most commerce bot demos stop at menus and payment links. Architect Store focuses on the

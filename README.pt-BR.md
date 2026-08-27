@@ -9,6 +9,13 @@ O projeto foi desenhado para gift cards, licenças, links de ativação e creden
 revenda esteja expressamente autorizada. O software não valida a origem comercial do
 estoque: mantenha contratos, notas e autorizações de cada fornecedor.
 
+## Demonstração
+
+[![Assistir à demonstração da Architect Store no Telegram](docs/assets/social-preview.png)](docs/assets/architect-store-demo.mp4)
+
+▶️ **[Assistir ao vídeo de 15 segundos](docs/assets/architect-store-demo.mp4)** — catálogo,
+compra sandbox, atualização transacional do saldo e histórico de pedidos no Telegram.
+
 ## O que já está implementado
 
 - Bot em português com catálogo, saldo, recarga, compras e suporte.
